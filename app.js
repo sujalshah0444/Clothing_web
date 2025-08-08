@@ -98,13 +98,8 @@ const fabricData = {
 
 // Cloth cutting animation functions
 function initClothCuttingAnimation() {
-    // Check if animation has been shown using localStorage for persistent storage
-    const hasSeenAnimation = localStorage.getItem('scissorCutSeen');
-    
-    if (!hasSeenAnimation) {
-        showClothCuttingAnimation();
-        localStorage.setItem('scissorCutSeen', 'true');
-    }
+    // Show the scissors cutting animation for every visitor
+    showClothCuttingAnimation();
 }
 
 function showClothCuttingAnimation() {
@@ -115,20 +110,28 @@ function showClothCuttingAnimation() {
         const clothRight = document.getElementById('cloth-right');
         const clothTop = document.getElementById('cloth-top');
         const clothBottom = document.getElementById('cloth-bottom');
+        const websiteContent = document.getElementById('websiteContent');
         
         if (!overlay) return;
         
-        // Show the overlay
+        // Show the overlay and hide website content
         overlay.classList.remove('hidden');
+        if (websiteContent) {
+            websiteContent.classList.remove('revealed');
+        }
         
         // Determine if we're on mobile for responsive animation
         const isMobile = window.innerWidth < 768;
+        
+        // Add tearing effect classes
+        overlay.classList.add('cloth-tearing');
         
         // Set up responsive cutting direction
         if (isMobile) {
             // Vertical cut for mobile
             cutLine.className = 'cut-line cut-line-vertical';
             scissors.classList.add('scissors-vertical');
+            overlay.classList.add('vertical');
             
             // Show top/bottom halves, hide left/right
             clothTop.classList.remove('hidden');
@@ -137,13 +140,14 @@ function showClothCuttingAnimation() {
             clothRight.classList.add('hidden');
             
             // Position scissors at top center
-            scissors.style.top = '-2rem';
+            scissors.style.top = '-3rem';
             scissors.style.left = '50%';
             scissors.style.transform = 'translateX(-50%) rotate(45deg)';
         } else {
             // Horizontal cut for desktop
             cutLine.className = 'cut-line cut-line-horizontal';
             scissors.classList.remove('scissors-vertical');
+            overlay.classList.add('horizontal');
             
             // Show left/right halves, hide top/bottom
             clothLeft.classList.remove('hidden');
@@ -153,36 +157,58 @@ function showClothCuttingAnimation() {
             
             // Position scissors at left center
             scissors.style.top = '50%';
-            scissors.style.left = '-2rem';
+            scissors.style.left = '-3rem';
             scissors.style.transform = 'translateY(-50%) rotate(-45deg)';
         }
         
-        // Animation sequence
+        // Enhanced animation sequence
         setTimeout(() => {
+            // Start scissors cutting animation
+            scissors.classList.add('scissors-cutting');
+            
             // Start scissors movement
             if (isMobile) {
-                scissors.style.top = 'calc(100% + 2rem)';
+                scissors.style.top = 'calc(50% - 1.5rem)';
             } else {
-                scissors.style.left = 'calc(100% + 2rem)';
+                scissors.style.left = 'calc(50% - 1.5rem)';
             }
             
-            // Show cut line after scissors starts moving
-            setTimeout(() => {
-                cutLine.style.opacity = '1';
-            }, 500);
-            
-        }, 500);
+        }, 300);
         
-        // Split and slide cloth halves
+        // Show cut line and tearing effect as scissors reach middle
+        setTimeout(() => {
+            cutLine.classList.add('active');
+            overlay.classList.add('active');
+        }, 1200);
+        
+        // Continue scissors movement to complete the cut
         setTimeout(() => {
             if (isMobile) {
-                clothTop.style.transform = 'translateY(-100%)';
-                clothBottom.style.transform = 'translateY(100%)';
+                scissors.style.top = 'calc(100% + 3rem)';
             } else {
-                clothLeft.style.transform = 'translateX(-100%)';
-                clothRight.style.transform = 'translateX(100%)';
+                scissors.style.left = 'calc(100% + 3rem)';
             }
-        }, 1800);
+        }, 1500);
+        
+        // Start cloth splitting with dramatic effect
+        setTimeout(() => {
+            scissors.classList.remove('scissors-cutting');
+            
+            if (isMobile) {
+                clothTop.style.transform = 'translateY(-100%) rotate(-2deg)';
+                clothBottom.style.transform = 'translateY(100%) rotate(2deg)';
+            } else {
+                clothLeft.style.transform = 'translateX(-100%) rotate(-1deg)';
+                clothRight.style.transform = 'translateX(100%) rotate(1deg)';
+            }
+        }, 2200);
+        
+        // Reveal website content with scaling effect
+        setTimeout(() => {
+            if (websiteContent) {
+                websiteContent.classList.add('revealed');
+            }
+        }, 2800);
         
         // Fade out the entire overlay
         setTimeout(() => {
@@ -192,7 +218,7 @@ function showClothCuttingAnimation() {
             setTimeout(() => {
                 overlay.remove();
             }, 500);
-        }, 3000);
+        }, 3800);
     }
 
 // Fabric Modal System
@@ -998,8 +1024,11 @@ window.addEventListener('resize', function() {
 
 // Debug function to manually trigger cloth cutting animation (for testing)
 window.triggerClothAnimation = function() {
-    // Remove the localStorage flag to allow animation replay
-    localStorage.removeItem('scissorCutSeen');
+    // Hide website content for the animation
+    const websiteContent = document.getElementById('websiteContent');
+    if (websiteContent) {
+        websiteContent.classList.remove('revealed');
+    }
     
     // Create a new overlay if it doesn't exist
     if (!document.getElementById('cloth-overlay')) {
@@ -1016,12 +1045,12 @@ window.triggerClothAnimation = function() {
             <div class="absolute inset-0 flex items-center justify-center">
                 <div class="text-center text-white">
                     <div class="text-4xl font-serif mb-4">
-                        Pro<span class="text-yellow-400">fabrics</span>
+                        Pro<span class="text-brand-gold">fabrics</span>
                     </div>
                     <div class="flex justify-center space-x-2">
-                        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce"></div>
-                        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-brand-gold rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-brand-gold rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-brand-gold rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                     </div>
                 </div>
             </div>
@@ -1031,5 +1060,20 @@ window.triggerClothAnimation = function() {
     
     // Trigger the animation
     initClothCuttingAnimation();
-    console.log('Cloth cutting animation triggered manually. Refresh to see it on page load.');
+    console.log('Cloth cutting animation triggered manually.');
+};
+
+// Debug function to reset and show content immediately
+window.showWebsiteContent = function() {
+    const websiteContent = document.getElementById('websiteContent');
+    const overlay = document.getElementById('cloth-overlay');
+    
+    if (websiteContent) {
+        websiteContent.classList.add('revealed');
+    }
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+    
+    console.log('Website content revealed immediately.');
 };

@@ -86,37 +86,139 @@
             position: absolute;
             font-size: 3rem;
             color: #f59e0b;
-            transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform: rotate(-45deg);
             filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+            z-index: 10;
         }
 
         .scissors-vertical {
             transform: rotate(45deg);
         }
 
+        .scissors-cutting {
+            animation: scissorCut 0.3s ease-in-out infinite;
+        }
+
+        @keyframes scissorCut {
+            0%, 100% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-42deg) scale(1.05); }
+        }
+
+        @keyframes scissorCutVertical {
+            0%, 100% { transform: rotate(45deg) scale(1); }
+            50% { transform: rotate(48deg) scale(1.05); }
+        }
+
+        .scissors-cutting.scissors-vertical {
+            animation: scissorCutVertical 0.3s ease-in-out infinite;
+        }
+
         .cut-line {
             position: absolute;
-            background: linear-gradient(90deg, transparent, #f59e0b, transparent);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: all 0.3s ease;
+            z-index: 5;
         }
 
         .cut-line-horizontal {
             top: 50%;
             left: 0;
-            width: 100%;
-            height: 2px;
+            width: 0%;
+            height: 3px;
             transform: translateY(-50%);
+            background: linear-gradient(90deg, 
+                transparent, 
+                #f59e0b, 
+                #fbbf24, 
+                #f59e0b, 
+                transparent
+            );
+            box-shadow: 0 0 10px #f59e0b;
         }
 
         .cut-line-vertical {
             top: 0;
             left: 50%;
-            width: 2px;
+            width: 3px;
+            height: 0%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, 
+                transparent, 
+                #f59e0b, 
+                #fbbf24, 
+                #f59e0b, 
+                transparent
+            );
+            box-shadow: 0 0 10px #f59e0b;
+        }
+
+        .cut-line.active {
+            opacity: 1;
+        }
+
+        .cut-line-horizontal.active {
+            width: 100%;
+        }
+
+        .cut-line-vertical.active {
+            height: 100%;
+        }
+
+        /* Cloth tearing effect */
+        .cloth-tearing {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cloth-tearing::before,
+        .cloth-tearing::after {
+            content: '';
+            position: absolute;
+            background: #f59e0b;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .cloth-tearing.horizontal::before,
+        .cloth-tearing.horizontal::after {
+            top: 50%;
+            height: 1px;
+            width: 100%;
+            transform: translateY(-50%);
+        }
+
+        .cloth-tearing.vertical::before,
+        .cloth-tearing.vertical::after {
+            left: 50%;
+            width: 1px;
             height: 100%;
             transform: translateX(-50%);
-            background: linear-gradient(180deg, transparent, #f59e0b, transparent);
+        }
+
+        .cloth-tearing.active::before,
+        .cloth-tearing.active::after {
+            opacity: 0.3;
+        }
+
+        /* Enhanced cloth splitting animation */
+        .cloth-half {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.95);
+            transition: transform 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            backdrop-filter: blur(2px);
+        }
+
+        /* Website reveal effect */
+        .website-content {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1s ease-out;
+        }
+
+        .website-content.revealed {
+            opacity: 1;
+            transform: scale(1);
         }
 
         /* Animation keyframes */
@@ -167,6 +269,9 @@
         </div>
     </div>
 
+    <!-- Main Website Content Wrapper -->
+    <div id="websiteContent" class="website-content">
+    
     <!-- Navigation -->
     <nav class="bg-brand-navy shadow-lg fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -685,6 +790,8 @@
             </div>
         </div>
     </footer>
+    
+    </div> <!-- End Website Content Wrapper -->
 
     <!-- Fabric Selection Modal -->
     <div id="fabricModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
